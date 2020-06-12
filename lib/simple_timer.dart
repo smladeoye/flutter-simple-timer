@@ -1,0 +1,447 @@
+library timer;
+
+import 'dart:math' as Math;
+import 'package:flutter/material.dart';
+
+/// A Simple Timer Widget
+///
+/// The timer will take the size of its parent
+class SimpleTimer extends StatefulWidget {
+
+  /// Creates a Simple Timer with animated progress indicator
+  SimpleTimer({
+    Key key,
+    @required this.duration,
+    this.onStart,
+    this.onEnd,
+    this.valueListener,
+    this.progressTextFormatter,
+    this.controller,
+    this.status,
+    this.delay = const Duration(seconds: 0),
+    this.timerStyle = TimerStyle.ring,
+    this.displayProgressIndicator = true,
+    this.displayProgressText = true,
+    this.progressTextCountDirection = TimerProgressTextCountDirection.count_down,
+    this.progressIndicatorDirection = TimerProgressIndicatorDirection.clockwise,
+    this.backgroundColor = Colors.grey,
+    this.progressIndicatorColor = Colors.green,
+    this.startAngle = Math.pi * 1.5,
+    this.strokeWidth = 5.0,
+  }): assert(duration != null, "Timer Duration cannot be null"),
+        assert(status == null || controller == null, "If controller is provided, then status must be null - only one must be provided"),
+        assert(displayProgressIndicator || displayProgressText,
+        "At least either displayProgressText or displayProgressIndicator must be set to True"),
+        super(key: key);
+
+  /// The length of time for this timer.
+  final Duration duration;
+
+  /// The length of time to delay the start / animation of the timer.
+  ///
+  /// Defaults to `Duration(seconds: 0)`
+  final Duration delay;
+
+  /// Controls the status of the timer.
+  ///
+  /// If provided, status should be null - ensure you dispose of it
+  /// when done. If null, this widget will create its own [TimerController]
+  /// and dispose it when the widget is disposed.
+  final TimerController controller;
+
+  /// The current status of the timer.
+  ///
+  /// This can also be used to control this timer instead of a controller
+  /// but providing a controller would be preferable.
+  /// If provided, controller should be null
+  final TimerStatus status;
+
+  /// The display style for this timer.
+  ///
+  /// The look of the displayed widget is changed based on the selected style.
+  /// Defaults to [TimerStyle.ring]
+  final TimerStyle timerStyle;
+
+  /// A function to format the text displayed by this Timer.
+  ///
+  /// This callback function is passed the a [Duration] (either time left
+  /// or time elapsed) which is determined by the [progressTextCountDirection]
+  final String Function(Duration timeElapsed) progressTextFormatter;
+
+  /// The callback function executed when the timer starts counting.
+  ///
+  /// The timer starts counting after the [delay]
+  final VoidCallback onStart;
+
+  /// The callback function executed when the timer has finished counting.
+  ///
+  /// The is only called when the timer has completed the length of its running duration
+  final VoidCallback onEnd;
+
+  /// The callback function executed for each change in the time elapsed by the timer.
+  ///
+  /// This callback function is passed a [Duration] (either time left
+  /// or time elapsed) which is determined by the [progressTextDisplayDirection]
+  final void Function(Duration timeElapsed) valueListener;
+
+  /// The counting direction (counting up or counting down) of the text displayed by the timer.
+  final TimerProgressTextCountDirection progressTextCountDirection;
+  
+  /// The rotating direction of this timer's progress indicator.
+  ///
+  /// Defaults to [TimerProgressIndicatorDirection.clockwise]
+  final TimerProgressIndicatorDirection progressIndicatorDirection;
+
+  /// Sets whether to display the progress text.
+  ///
+  /// At least either this or [displayProgressIndicator] must be set as true
+  /// Defaults to true.
+  final bool displayProgressText;
+
+  /// Sets whether to display the progress text.
+  ///
+  /// At least either this or [displayProgressText] must be set as true
+  /// Defaults to true.
+  final bool displayProgressIndicator;
+
+  /// The color of the animating progress indicator.
+  final Color progressIndicatorColor;
+
+  /// The background color of the inner shape (circle) of the timer
+  final Color backgroundColor;
+
+  /// The start angle of the progress indicator.
+  ///
+  /// Defaults to `Math.pi * 1.5` - At the top
+  final double startAngle;
+
+  /// The width of the brush stroke used to paint this timer's shape.
+  ///
+  /// Defaults to `5.0`
+  final double strokeWidth;
+
+  @override
+  State<StatefulWidget> createState() {
+    return TimerState();
+  }
+}
+
+class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin {
+
+  /// This timer's animation controller.
+  ///
+  /// This is indirectly referenced by the widget status [widget.status]
+  /// and controls when the timer is started [TimerStatus.start], paused
+  /// [TimerStatus.pause] or reset [TimerStatus.reset]
+  TimerController controller;
+
+  bool _useLocalController = false;
+
+  /// Sets `true` if the timer has started running.
+  ///
+  /// This is used to know when to apply the delay; If the timer not been
+  /// started (when created or reset) then the delay is applied, but if it
+  /// has ever been started then no delay is applied again at any point when
+  /// it is paused and started
+  bool wasActive = false;
+
+  ThemeData themeData;
+
+  @override
+  void initState() {
+    if(widget.controller == null) {
+      controller = TimerController(this);
+      _useLocalController = true;
+    } else {
+      controller = widget.controller;
+    }
+    controller.duration = widget.duration;
+    controller._setDelay(widget.delay);
+    controller.addListener(_animationValueListener);
+    controller.addStatusListener(_animationStatusListener);
+    if(_useLocalController && (widget.status == TimerStatus.start)) {
+      _startTimer(true);
+    }
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("rebuilding");
+    themeData = Theme.of(context);
+    return Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child:  Align(
+            alignment: FractionalOffset.center,
+            child: AspectRatio(
+              aspectRatio: 1.0,
+              child: Stack(
+                children: <Widget>[
+                  widget.displayProgressIndicator ?
+                  AnimatedBuilder(
+                    animation: controller,
+                    builder: (context, _) {
+                      return CustomPaint(
+                        size: MediaQuery.of(context).size,
+                        painter: TimerPainter(
+                            animation: controller,
+                            timerStyle: widget.timerStyle,
+                            progressIndicatorDirection: widget.progressIndicatorDirection,
+                            progressIndicatorColor: widget.progressIndicatorColor,
+                            backgroundColor: widget.backgroundColor,
+                            startAngle: widget.startAngle,
+                            strokeWidth: widget.strokeWidth
+                        ),
+                      );
+                    },
+                  ) : Container(),
+                  widget.displayProgressText ? Container(
+                    margin: const EdgeInsets.all(5),
+                    child: Align(
+                      alignment: FractionalOffset.center,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: AnimatedBuilder(
+                            animation: controller,
+                            builder: (context, child) {
+                              return Text(getTextDisplay(),
+                                  style: TextStyle(fontSize: themeData.textTheme.headline1.fontSize)
+                              );
+                            }
+                        ),
+                      ),
+                    ),
+                  ) : Container()
+                ],
+              ),
+            )
+        )
+    );
+  }
+
+  @override
+  void didUpdateWidget(SimpleTimer oldWidget) {
+    if (_useLocalController) {
+      if (widget.status == TimerStatus.start && oldWidget.status != TimerStatus.start) {
+        // checks if the animation has not started then the delay is still valid
+        print("old widget value: ${oldWidget.status}");
+        if (controller.isDismissed) {
+          _startTimer();
+        } else {
+          _startTimer(false);
+        }
+      } else if (widget.status == TimerStatus.pause && oldWidget.status != TimerStatus.pause) {
+        controller.pause();
+      } else if (widget.status == TimerStatus.reset && oldWidget.status != TimerStatus.reset) {
+        controller.reset();
+      }
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _startTimer([bool useDelay = true]) {
+    if(useDelay && !controller._wasActive) {
+      controller._wasActive = true;
+      Future.delayed(widget.delay, () {
+        if(mounted && (widget.status == TimerStatus.start)) {
+          controller.forward();
+        }
+      });
+    } else {
+      controller.forward();
+    }
+  }
+
+  void _animationValueListener() {
+    if(widget.valueListener != null) {
+      widget.valueListener(controller.duration * controller.value);
+    }
+  }
+
+  void _animationStatusListener(AnimationStatus status) {
+    if(status == AnimationStatus.forward && widget.onStart != null) {
+      wasActive = true;
+      widget.onStart();
+    } else if(status == AnimationStatus.completed && widget.onEnd != null) {
+      widget.onEnd();
+    } else if(status == AnimationStatus.dismissed) {
+      wasActive = false;
+    }
+  }
+
+  String getTextDisplay() {
+    Duration duration = controller.duration * controller.value;
+    if(widget.progressTextCountDirection == TimerProgressTextCountDirection.count_down) {
+      duration = Duration(seconds: controller.duration.inSeconds - duration.inSeconds);
+    }
+    if(widget.progressTextFormatter == null) {
+      return "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
+    }
+    return widget.progressTextFormatter(duration);
+  }
+
+  @override
+  void dispose() {
+    controller.stop();
+    controller.removeStatusListener(_animationStatusListener);
+    if(_useLocalController) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+}
+
+class TimerPainter extends CustomPainter {
+  final Animation<double> animation;
+  TimerProgressIndicatorDirection progressIndicatorDirection;
+  TimerStyle timerStyle;
+  Color progressIndicatorColor, backgroundColor;
+  double startAngle;
+  double strokeWidth;
+
+  TimerPainter({this.animation,
+    this.progressIndicatorDirection,
+    this.progressIndicatorColor,
+    this.backgroundColor,
+    this.timerStyle,
+    this.startAngle,
+    this.strokeWidth}
+      ) : super(repaint: animation);
+
+  PaintingStyle getPaintingStyle() {
+    switch(timerStyle) {
+      case TimerStyle.ring:
+        return PaintingStyle.stroke;
+      case TimerStyle.expanding_sector:
+        return PaintingStyle.fill;
+      case TimerStyle.expanding_circle:
+        return PaintingStyle.fill;
+      case TimerStyle.expanding_segment:
+        return PaintingStyle.fill;
+      default:
+        timerStyle = TimerStyle.ring;
+        return PaintingStyle.stroke;
+    }
+  }
+
+  double getProgressRadius(double circleRadius) {
+    if(timerStyle == TimerStyle.expanding_circle) {
+      circleRadius = circleRadius * animation.value;
+    }
+    return circleRadius;
+  }
+
+  double getProgressSweepAngle() {
+    double progress = 2 * Math.pi;
+    if(timerStyle == TimerStyle.expanding_circle) {
+      return progress;
+    }
+    progress = animation.value * progress;
+    if (progressIndicatorDirection == TimerProgressIndicatorDirection.counter_clockwise) {
+      progress = -progress;
+    }
+    return progress;
+  }
+
+  bool shouldUseCircleCenter() {
+    if(timerStyle == TimerStyle.ring) {
+      return false;
+    } else if(timerStyle == TimerStyle.expanding_segment) {
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    double radius = Math.min(size.width, size.height) / 2;
+    final Offset center = size.center(Offset.zero);
+    final Paint paint = Paint()
+      ..color = backgroundColor
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round
+      ..style = getPaintingStyle();
+
+    canvas.drawCircle(center, radius, paint);
+
+    Rect rect = Rect.fromCircle(center: center, radius: getProgressRadius(radius));
+    paint.color = progressIndicatorColor;
+    canvas.drawArc(rect, startAngle, getProgressSweepAngle(), shouldUseCircleCenter(), paint);
+  }
+
+  @override
+  bool shouldRepaint(TimerPainter oldDelegate) {
+    return animation.value != oldDelegate.animation.value ||
+        oldDelegate.progressIndicatorColor != progressIndicatorColor ||
+        backgroundColor != oldDelegate.backgroundColor;
+  }
+}
+
+class TimerController extends AnimationController {
+
+  bool _wasActive = false;
+
+  Duration _delay;
+
+  TimerController(TickerProvider vsync) : super(vsync: vsync);
+
+  Duration get delay => _delay;
+
+  void _setDelay(Duration delay) {
+    this._delay = delay;
+  }
+
+  void start({bool useDelay = true, double startFrom}) {
+    if(useDelay && !_wasActive && (_delay != null)) {
+      _wasActive = true;
+      Future.delayed(_delay, () {
+        this.forward(from: startFrom);
+      });
+    } else {
+      this.forward(from: startFrom);
+    }
+  }
+
+  void pause() {
+    this.stop();
+  }
+
+  @override
+  void reset() {
+    _wasActive = false;
+    super.reset();
+  }
+
+  void restart({bool useDelay = true, double startFrom}) {
+    this.reset();
+    this.start(startFrom: startFrom);
+  }
+
+}
+
+enum TimerStatus
+{
+  start,
+  pause,
+  reset,
+}
+
+enum TimerProgressTextCountDirection
+{
+  count_down,
+  count_up,
+}
+
+enum TimerProgressIndicatorDirection
+{
+  clockwise,
+  counter_clockwise,
+}
+
+// test
+enum TimerStyle {
+  ring,
+  expanding_sector,
+  expanding_segment,
+  expanding_circle
+}
