@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Timer Widget Demo'),
+      home: MyHomePage(title: 'Simple Timer Widget Demo'),
     );
   }
 }
@@ -58,18 +58,18 @@ class _MyHomePageState extends State<MyHomePage>
                 child: Container(
                   margin: EdgeInsets.symmetric(vertical: 10),
                   child: SimpleTimer(
-                    duration: const Duration(seconds: 30),
+                    duration: const Duration(seconds: 5),
                     controller: _timerController,
                     timerStyle: _timerStyle,
-                    valueListener: timerValueChangeListener,
-                    delay: const Duration(seconds: 5),
                     onStart: handleTimerOnStart,
                     onEnd: handleTimerOnEnd,
-                    strokeWidth: 10,
+                    valueListener: timerValueChangeListener,
                     backgroundColor: Colors.grey,
                     progressIndicatorColor: Colors.green,
                     progressIndicatorDirection: _progressIndicatorDirection,
                     progressTextCountDirection: _progressTextCountDirection,
+                    progressTextStyle: TextStyle(color: Colors.black),
+                    strokeWidth: 10,
                   ),
                 )
             ),
@@ -202,7 +202,7 @@ class _MyHomePageState extends State<MyHomePage>
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     FlatButton(
-                      onPressed: ()=>_setCountDirection(TimerProgressTextCountDirection.count_up),
+                      onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.clockwise),
                       color: Colors.blue,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

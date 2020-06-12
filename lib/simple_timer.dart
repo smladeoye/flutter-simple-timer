@@ -18,6 +18,7 @@ class SimpleTimer extends StatefulWidget {
     this.progressTextFormatter,
     this.controller,
     this.status,
+    this.progressTextStyle,
     this.delay = const Duration(seconds: 0),
     this.timerStyle = TimerStyle.ring,
     this.displayProgressIndicator = true,
@@ -62,7 +63,7 @@ class SimpleTimer extends StatefulWidget {
   /// Defaults to [TimerStyle.ring]
   final TimerStyle timerStyle;
 
-  /// A function to format the text displayed by this Timer.
+  /// A callback function to format the text displayed by this Timer.
   ///
   /// This callback function is passed the a [Duration] (either time left
   /// or time elapsed) which is determined by the [progressTextCountDirection]
@@ -97,6 +98,8 @@ class SimpleTimer extends StatefulWidget {
   /// At least either this or [displayProgressIndicator] must be set as true
   /// Defaults to true.
   final bool displayProgressText;
+
+  final TextStyle progressTextStyle;
 
   /// Sets whether to display the progress text.
   ///
@@ -145,8 +148,6 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
   /// it is paused and started
   bool wasActive = false;
 
-  ThemeData themeData;
-
   @override
   void initState() {
     if(widget.controller == null) {
@@ -167,8 +168,6 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
 
   @override
   Widget build(BuildContext context) {
-    print("rebuilding");
-    themeData = Theme.of(context);
     return Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
         child:  Align(
@@ -204,9 +203,7 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
                         child: AnimatedBuilder(
                             animation: controller,
                             builder: (context, child) {
-                              return Text(getTextDisplay(),
-                                  style: TextStyle(fontSize: themeData.textTheme.headline1.fontSize)
-                              );
+                              return Text(getProgressText(), style: getProgressTextStyle());
                             }
                         ),
                       ),
@@ -219,12 +216,14 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
     );
   }
 
+  TextStyle getProgressTextStyle() {
+    return TextStyle(fontSize: Theme.of(context).textTheme.headline1.fontSize).merge(widget.progressTextStyle);
+  }
+
   @override
   void didUpdateWidget(SimpleTimer oldWidget) {
     if (_useLocalController) {
       if (widget.status == TimerStatus.start && oldWidget.status != TimerStatus.start) {
-        // checks if the animation has not started then the delay is still valid
-        print("old widget value: ${oldWidget.status}");
         if (controller.isDismissed) {
           _startTimer();
         } else {
@@ -269,7 +268,7 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
     }
   }
 
-  String getTextDisplay() {
+  String getProgressText() {
     Duration duration = controller.duration * controller.value;
     if(widget.progressTextCountDirection == TimerProgressTextCountDirection.count_down) {
       duration = Duration(seconds: controller.duration.inSeconds - duration.inSeconds);
