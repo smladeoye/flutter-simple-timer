@@ -1,7 +1,6 @@
 name: simple_timer
 description: A Simple Timer Widget with various customizable options.
 version: 1.0.0
-author: smladeoye
 homepage: https://github.com/smladeoye/flutter-simple-timer
 
 environment:
