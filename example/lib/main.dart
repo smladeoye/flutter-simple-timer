@@ -218,6 +218,22 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ),
                     FlatButton(
+                      onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.both),
+                      color: Colors.green,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Flexible(
+                              child: const Text("Both",
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: Colors.white)
+                              )
+                          ),
+                          Icon(Icons.compare_arrows, size: 18, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                    FlatButton(
                       onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.counter_clockwise),
                       color: Colors.orange,
                       child: Row(

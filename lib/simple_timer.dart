@@ -1,4 +1,4 @@
-library timer;
+library simple_timer;
 
 import 'dart:math' as Math;
 import 'package:flutter/material.dart';
@@ -99,6 +99,7 @@ class SimpleTimer extends StatefulWidget {
   /// Defaults to true.
   final bool displayProgressText;
 
+  /// The TextStyle applied to the progress text.
   final TextStyle progressTextStyle;
 
   /// Sets whether to display the progress text.
@@ -115,6 +116,7 @@ class SimpleTimer extends StatefulWidget {
 
   /// The start angle of the progress indicator.
   ///
+  /// The value is in radian.
   /// Defaults to `Math.pi * 1.5` - At the top
   final double startAngle;
 
@@ -342,6 +344,13 @@ class TimerPainter extends CustomPainter {
     return progress;
   }
 
+  double getStartAngle() {
+    if (progressIndicatorDirection == TimerProgressIndicatorDirection.both) {
+      return (startAngle - (Math.pi * animation.value)).abs();
+    }
+    return startAngle;
+  }
+
   bool shouldUseCircleCenter() {
     if(timerStyle == TimerStyle.ring) {
       return false;
@@ -365,7 +374,7 @@ class TimerPainter extends CustomPainter {
 
     Rect rect = Rect.fromCircle(center: center, radius: getProgressRadius(radius));
     paint.color = progressIndicatorColor;
-    canvas.drawArc(rect, startAngle, getProgressSweepAngle(), shouldUseCircleCenter(), paint);
+    canvas.drawArc(rect, getStartAngle(), getProgressSweepAngle(), shouldUseCircleCenter(), paint);
   }
 
   @override
@@ -435,6 +444,7 @@ enum TimerProgressIndicatorDirection
 {
   clockwise,
   counter_clockwise,
+  both
 }
 
 // test

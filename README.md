@@ -132,7 +132,7 @@ There are various customizable options provided by the SimpleTimer widget, see b
 		<td>progressTextCountDirection</td>
 		<td>The counting direction of the text displayed by the timer</td>
 		<td>TimerProgressTextCountDirection</td>
-		<td>clockwise</td>
+		<td>count_down</td>
 	</tr>
 	<tr>
 		<td>progressTextFormatter</td>
