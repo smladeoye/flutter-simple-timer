@@ -47,6 +47,7 @@ The timer can be controlled in two ways:
         )
     )
     ```
+**Note: The SimpleTimer widget uses its parent size.**
 
 ### Customizable Options
 There are various customizable options provided by the SimpleTimer widget, see below:
