@@ -5,7 +5,9 @@ A Timer Widget with various customizable options
 ## Installing
 
 To Start using this library include **simple_timer** as a dependency in your **puspec.yaml** file. 
-Make sure to include the latest version
+Make sure to include the latest version.
+
+**Pub link:** <a href="https://pub.dev/packages/simple_timer" target="_blank">https://pub.dev/packages/simple_timer</a>
 
 ## Usage
 
@@ -165,6 +167,8 @@ There are various customizable options provided by the SimpleTimer widget, see b
 	</tr>
 </tbody>
 </table>
+
+**Pub link:** <a href="https://pub.dev/packages/simple_timer" target="_blank">https://pub.dev/packages/simple_timer</a>
 
 ## Demo - Controlling the Timer Status
 ![simple_timer_demo_01](https://user-images.githubusercontent.com/12571220/84502612-9c04c000-acb0-11ea-83d7-55ab37e04dd4.gif)
