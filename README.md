@@ -37,6 +37,10 @@ The timer can be controlled in two ways:
         )
     )
     ```
+    Call the TimerController start method (**_timerController.start()**) to start the timer, 
+    the pause method (**_timerController.pause()**) to pause the timer, 
+    the reset method (**_timerController.reset()**) to reset the timer and 
+    the restart method (**_timerController.restart()**) to restart the timer.
 
 * **Setting the Status** - The timer can also be controler by passing a **TimerStatus** value to the status property; like below:
     ```
