@@ -1,5 +1,5 @@
 name: simple_timer
-description: A Simple Timer Widget with various customizable options.
+description: A Simple Timer Widget that display the timer progress with various customizable options.
 version: 1.0.0
 homepage: https://github.com/smladeoye/flutter-simple-timer
 

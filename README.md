@@ -39,10 +39,51 @@ The timer can be controlled in two ways:
         )
     )
     ```
-    Call the TimerController start method (**_timerController.start()**) to start the timer, 
-    the pause method (**_timerController.pause()**) to pause the timer, 
-    the reset method (**_timerController.reset()**) to reset the timer and 
-    the restart method (**_timerController.restart()**) to restart the timer.
+    
+    **TimerController methods:**
+    
+    <table>
+    <thead>
+	<tr>
+		<th>Method</th>
+		<th>Description</th>
+	</tr>
+	<tbody>
+	    <tr>
+		    <td>start</td>
+		    <td>Starts the timer e.g. <span style="font-weight:bold">(_timerController.start())</span>
+		    </td>
+	    </tr>
+	    <tr>
+		    <td>pause</td>
+		    <td>Pauses the timer e.g. <span style="font-weight:bold">(_timerController.pause())</span>
+		    </td>
+	    </tr>
+	    <tr>
+		    <td>reset</td>
+		    <td>
+		    Resets the timer e.g. <span style="font-weight:bold">(_timerController.reset())</span>
+		    </td>
+	    </tr>
+	    <tr>
+		    <td>restart</td>
+		    <td>
+		    Restarts the timer e.g. <span style="font-weight:bold">(_timerController.restart())</span>
+		    </td>
+	    </tr>
+	    <tr>
+		    <td>add</td>
+		    <td>Increases time left by the specified duration i.e. allows more time e.g. <span style="font-weight:bold">(_timerController.add(Duration(seconds: 10)))</span>
+		    </td>
+	    </tr>
+	    <tr>
+		    <td>subtract</td>
+		    <td>Decreases time left by the specified duration i.e. reduces the time e.g. <span style="font-weight:bold">(_timerController.subtract(Duration(seconds: 10)))</span>
+		    </td>
+	    </tr>
+	</tbody>
+    </thead>
+    </table>
 
 * **Setting the Status** - The timer can also be controler by passing a **TimerStatus** value to the status property; like below:
     ```
