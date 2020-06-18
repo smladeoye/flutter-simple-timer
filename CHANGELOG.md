@@ -1,4 +1,5 @@
-## [1.0.0] - JUNE 2020.
-
+## 1.0.0
 * Initial Flutter SimpleTimer Library Release
-* Added TimerController add and subtract methods
+
+## 1.0.1
+* Added TimerController add and subtract duration methods

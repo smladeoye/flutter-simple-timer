@@ -1,6 +1,6 @@
 # SimpleTimer
 
-A Timer Widget with various customizable options
+A Simple Timer Widget that displays the timer progress with various customizable options.
 
 ## Installing
 
