@@ -79,25 +79,33 @@ class _MyHomePageState extends State<MyHomePage>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
-                    FlatButton(
+                    TextButton(
                       onPressed: _timerController.start,
                       child: const Text("Start", style: TextStyle(color: Colors.white)),
-                      color: Colors.green,
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.green
+                      )
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: _timerController.pause,
                       child: const Text("Pause", style: TextStyle(color: Colors.white)),
-                      color: Colors.blue,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.blue
+                      )
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: _timerController.reset,
                       child: const Text("Reset", style: TextStyle(color: Colors.white)),
-                      color: Colors.red,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.red
+                      )
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: _timerController.restart,
                       child: const Text("Restart", style: TextStyle(color: Colors.white)),
-                      color: Colors.orange,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange
+                      )
                     ),
                   ],
                 )
@@ -110,9 +118,11 @@ class _MyHomePageState extends State<MyHomePage>
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     Flexible(
-                        child: FlatButton(
+                        child: TextButton(
                             onPressed: ()=>_setStyle(TimerStyle.ring),
-                            color: Colors.blue,
+                            style: TextButton.styleFrom(
+                                backgroundColor: Colors.blue
+                            ),
                             child:  const Text("Ring",
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(color: Colors.white)
@@ -120,9 +130,11 @@ class _MyHomePageState extends State<MyHomePage>
                         )
                     ),
                     Flexible(
-                      child: FlatButton(
+                      child: TextButton(
                           onPressed: ()=>_setStyle(TimerStyle.expanding_circle),
-                          color: Colors.green,
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.green
+                          ),
                           child: const Text("Expanding Circle",
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.white)
@@ -130,9 +142,11 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ),
                     Flexible(
-                      child: FlatButton(
+                      child: TextButton(
                           onPressed: ()=>_setStyle(TimerStyle.expanding_sector),
-                          color: Colors.orange,
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.orange
+                          ),
                           child: const Text("Expanding Sector",
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.white)
@@ -140,9 +154,11 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ),
                     Flexible(
-                      child: FlatButton(
+                      child: TextButton(
                           onPressed: ()=>_setStyle(TimerStyle.expanding_segment),
-                          color: Colors.red,
+                          style: TextButton.styleFrom(
+                              backgroundColor: Colors.red
+                          ),
                           child: const Text("Expanding Segment",
                               textAlign: TextAlign.center,
                               style: const TextStyle(color: Colors.white)
@@ -159,9 +175,11 @@ class _MyHomePageState extends State<MyHomePage>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    FlatButton(
+                    TextButton(
                       onPressed: ()=>_setCountDirection(TimerProgressTextCountDirection.count_up),
-                      color: Colors.blue,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.blue
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -175,9 +193,11 @@ class _MyHomePageState extends State<MyHomePage>
                         ],
                       ),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: ()=>_setCountDirection(TimerProgressTextCountDirection.count_down),
-                      color: Colors.orange,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -201,9 +221,11 @@ class _MyHomePageState extends State<MyHomePage>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    FlatButton(
+                    TextButton(
                       onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.clockwise),
-                      color: Colors.blue,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.blue
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -217,9 +239,11 @@ class _MyHomePageState extends State<MyHomePage>
                         ],
                       ),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.both),
-                      color: Colors.green,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.green
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
@@ -233,9 +257,11 @@ class _MyHomePageState extends State<MyHomePage>
                         ],
                       ),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: ()=>_setProgressIndicatorDirection(TimerProgressIndicatorDirection.counter_clockwise),
-                      color: Colors.orange,
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[

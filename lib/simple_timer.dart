@@ -10,8 +10,8 @@ class SimpleTimer extends StatefulWidget {
 
   /// Creates a Simple Timer with animated progress indicator
   SimpleTimer({
-    Key key,
-    @required this.duration,
+    Key? key,
+    required this.duration,
     this.onStart,
     this.onEnd,
     this.valueListener,
@@ -29,8 +29,8 @@ class SimpleTimer extends StatefulWidget {
     this.progressIndicatorColor = Colors.green,
     this.startAngle = Math.pi * 1.5,
     this.strokeWidth = 5.0,
-  }): assert(duration != null, "Timer Duration cannot be null"),
-        assert(status == null || controller == null, "If controller is provided, then status must be null - only one must be provided"),
+  }):assert(!(status == null && controller == null), "No Controller or Status has been set; Please set either the controller (TimerController) or the status (TimerStatus) property - only should can be set"),
+        assert(status == null || controller == null, "Both Controller and Status have been set; Please set either the controller (TimerController) or the status (TimerStatus) - only one should be set"),
         assert(displayProgressIndicator || displayProgressText,
         "At least either displayProgressText or displayProgressIndicator must be set to True"),
         super(key: key);
@@ -48,14 +48,14 @@ class SimpleTimer extends StatefulWidget {
   /// If provided, status should be null - ensure you dispose of it
   /// when done. If null, this widget will create its own [TimerController]
   /// and dispose it when the widget is disposed.
-  final TimerController controller;
+  final TimerController? controller;
 
   /// The current status of the timer.
   ///
   /// This can also be used to control this timer instead of a controller
   /// but providing a controller would be preferable.
   /// If provided, controller should be null
-  final TimerStatus status;
+  final TimerStatus? status;
 
   /// The display style for this timer.
   ///
@@ -67,23 +67,23 @@ class SimpleTimer extends StatefulWidget {
   ///
   /// This callback function is passed the a [Duration] (either time left
   /// or time elapsed) which is determined by the [progressTextCountDirection]
-  final String Function(Duration timeElapsed) progressTextFormatter;
+  final String Function(Duration timeElapsed)? progressTextFormatter;
 
   /// The callback function executed when the timer starts counting.
   ///
   /// The timer starts counting after the [delay]
-  final VoidCallback onStart;
+  final VoidCallback? onStart;
 
   /// The callback function executed when the timer has finished counting.
   ///
   /// The is only called when the timer has completed the length of its running duration
-  final VoidCallback onEnd;
+  final VoidCallback? onEnd;
 
   /// The callback function executed for each change in the time elapsed by the timer.
   ///
   /// This callback function is passed a [Duration] (either time left
   /// or time elapsed) which is determined by the [progressTextDisplayDirection]
-  final void Function(Duration timeElapsed) valueListener;
+  final void Function(Duration timeElapsed)? valueListener;
 
   /// The counting direction (counting up or counting down) of the text displayed by the timer.
   final TimerProgressTextCountDirection progressTextCountDirection;
@@ -100,7 +100,7 @@ class SimpleTimer extends StatefulWidget {
   final bool displayProgressText;
 
   /// The TextStyle applied to the progress text.
-  final TextStyle progressTextStyle;
+  final TextStyle? progressTextStyle;
 
   /// Sets whether to display the progress text.
   ///
@@ -138,7 +138,7 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
   /// This is indirectly referenced by the widget status [widget.status]
   /// and controls when the timer is started [TimerStatus.start], paused
   /// [TimerStatus.pause] or reset [TimerStatus.reset]
-  TimerController controller;
+  late TimerController controller;
 
   bool _useLocalController = false;
 
@@ -156,7 +156,7 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
       controller = TimerController(this);
       _useLocalController = true;
     } else {
-      controller = widget.controller;
+      controller = widget.controller!;
     }
     controller.duration = widget.duration;
     controller._setDelay(widget.delay);
@@ -219,7 +219,7 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
   }
 
   TextStyle getProgressTextStyle() {
-    return TextStyle(fontSize: Theme.of(context).textTheme.headline1.fontSize).merge(widget.progressTextStyle);
+    return TextStyle(fontSize: Theme.of(context).textTheme.headline1!.fontSize).merge(widget.progressTextStyle);
   }
 
   @override
@@ -255,30 +255,30 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
 
   void _animationValueListener() {
     if(widget.valueListener != null) {
-      widget.valueListener(controller.duration * controller.value);
+      widget.valueListener!(controller.duration! * controller.value);
     }
   }
 
   void _animationStatusListener(AnimationStatus status) {
     if(status == AnimationStatus.forward && widget.onStart != null) {
       wasActive = true;
-      widget.onStart();
+      widget.onStart!();
     } else if(status == AnimationStatus.completed && widget.onEnd != null) {
-      widget.onEnd();
+      widget.onEnd!();
     } else if(status == AnimationStatus.dismissed) {
       wasActive = false;
     }
   }
 
   String getProgressText() {
-    Duration duration = controller.duration * controller.value;
+    Duration duration = controller.duration! * controller.value;
     if(widget.progressTextCountDirection == TimerProgressTextCountDirection.count_down) {
-      duration = Duration(seconds: controller.duration.inSeconds - duration.inSeconds);
+      duration = Duration(seconds: controller.duration!.inSeconds - duration.inSeconds);
     }
     if(widget.progressTextFormatter == null) {
       return "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
     }
-    return widget.progressTextFormatter(duration);
+    return widget.progressTextFormatter!(duration);
   }
 
   @override
@@ -300,14 +300,15 @@ class TimerPainter extends CustomPainter {
   double startAngle;
   double strokeWidth;
 
-  TimerPainter({this.animation,
-    this.progressIndicatorDirection,
-    this.progressIndicatorColor,
-    this.backgroundColor,
-    this.timerStyle,
-    this.startAngle,
-    this.strokeWidth}
-      ) : super(repaint: animation);
+  TimerPainter({
+    required this.animation,
+    this.progressIndicatorDirection = TimerProgressIndicatorDirection.clockwise,
+    this.progressIndicatorColor = Colors.green,
+    this.backgroundColor = Colors.grey,
+    this.timerStyle = TimerStyle.ring,
+    this.startAngle = Math.pi * 1.5,
+    this.strokeWidth = 5.0
+  }) : super(repaint: animation);
 
   PaintingStyle getPaintingStyle() {
     switch(timerStyle) {
@@ -389,11 +390,11 @@ class TimerController extends AnimationController {
 
   bool _wasActive = false;
 
-  Duration _delay;
+  Duration? _delay;
 
   TimerController(TickerProvider vsync) : super(vsync: vsync);
 
-  Duration get delay => _delay;
+  Duration? get delay => _delay;
 
   /// Sets the animation delay
   void _setDelay(Duration delay) {
@@ -401,19 +402,19 @@ class TimerController extends AnimationController {
   }
 
   /// Calculates controller start value from specified duration [startDuration]
-  double _calculateStartValue(Duration startDuration) {
-    startDuration = (startDuration != null && (startDuration > this.duration)) ? this.duration : startDuration;
-    return startDuration == null ? startDuration : (1 - (startDuration.inMilliseconds / this.duration.inMilliseconds));
+  double? _calculateStartValue(Duration? startDuration) {
+    startDuration = (startDuration != null && (startDuration > this.duration!)) ? this.duration : startDuration;
+    return startDuration == null ? null : (1 - (startDuration.inMilliseconds / this.duration!.inMilliseconds));
   }
 
   /// This starts the controller animation.
   ///
   /// If [startFrom] is specified, the new value is calculated
   /// and starts from that value, rather than from the [lowerBound]
-  void start({bool useDelay = true, Duration startFrom}) {
+  void start({bool useDelay = true, Duration? startFrom}) {
     if(useDelay && !_wasActive && (_delay != null)) {
       _wasActive = true;
-      Future.delayed(_delay, () {
+      Future.delayed(_delay!, () {
         this.forward(from: _calculateStartValue(startFrom));
       });
     } else {
@@ -437,7 +438,7 @@ class TimerController extends AnimationController {
   ///
   /// If [startFrom] is specified, the animation value is calculated
   /// and starts from that value, rather than from the [lowerBound]
-  void restart({bool useDelay = true, Duration startFrom}) {
+  void restart({bool useDelay = true, Duration? startFrom}) {
     this.reset();
     this.start(startFrom: startFrom);
   }
@@ -453,8 +454,8 @@ class TimerController extends AnimationController {
   /// The [animationDuration] value sets the length of time used to animate
   /// from the previous value to the new value
   void add(Duration duration, {bool start = false, Duration changeAnimationDuration = const Duration(seconds: 0)}) {
-    duration = (duration != null && (duration > this.duration)) ? this.duration : duration;
-    double newValue = this.value - (duration.inMilliseconds / this.duration.inMilliseconds);
+    duration = (duration > this.duration!) ? this.duration! : duration;
+    double newValue = this.value - (duration.inMilliseconds / this.duration!.inMilliseconds);
     this.animateBack(newValue, duration: changeAnimationDuration);
     if (start) {
       this.forward();
@@ -472,8 +473,8 @@ class TimerController extends AnimationController {
   /// The [animationDuration] value sets the length of time used to animate
   /// from the previous value to the new value
   void subtract(Duration duration, {bool start = false, Duration changeAnimationDuration = const Duration(seconds: 0)}) {
-    duration = (duration != null && (duration > this.duration)) ? this.duration : duration;
-    double newValue = this.value + (duration.inMilliseconds / this.duration.inMilliseconds);
+    duration = (duration > this.duration!) ? this.duration! : duration;
+    double newValue = this.value + (duration.inMilliseconds / this.duration!.inMilliseconds);
     this.animateTo(newValue, duration: changeAnimationDuration);
     if (start) {
       this.forward();
