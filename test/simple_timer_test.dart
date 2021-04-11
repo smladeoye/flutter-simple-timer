@@ -4,37 +4,81 @@ import 'package:simple_timer/simple_timer.dart';
 
 void main() {
 
-  testWidgets('Default Initial TextDisplay', (WidgetTester tester) async {
-    TimerController timerController = TimerController(const TestVSync());
-    await tester.pumpWidget(getSimpleTimerWidget(timerController));
+  group("Progress Text Display", () {
 
-    // find the SimpleTimer text display widget in the widget tree
-    final textDisplayFinder = find.text("0:05");
+    testWidgets('Default Initial Progress TextDisplay', (WidgetTester tester) async {
+      TimerController timerController = TimerController(const TestVSync());
+      await tester.pumpWidget(getSimpleTimerWidget(timerController));
 
-    // verify that the Text widgets appear exactly once in the widget tree.
-    expect(textDisplayFinder, findsOneWidget);
-  });
+      // find the SimpleTimer text display widget in the widget tree
+      final textDisplayFinder = find.text("0:05");
 
-  testWidgets('No Progress Text Display', (WidgetTester tester) async {
-    TimerController timerController = TimerController(const TestVSync());
-    await tester.pumpWidget(getSimpleTimerWithNoTextDisplayWidget(timerController));
+      // verify that the Text widgets appear exactly once in the widget tree.
+      expect(textDisplayFinder, findsOneWidget);
+    });
 
-    // find the SimpleTimer text display widget in the widget tree
-    final textFinder = find.byType(Text);
+    testWidgets('No Progress Text Display', (WidgetTester tester) async {
+      TimerController timerController = TimerController(const TestVSync());
+      await tester.pumpWidget(getSimpleTimerWithNoTextDisplayWidget(timerController));
 
-    // verify that the Text widget does not appear in the widget tree.
-    expect(textFinder, findsNothing);
-  });
+      // find the SimpleTimer text display widget in the widget tree
+      final textFinder = find.byType(Text);
 
-  testWidgets('Count Up Progress Text initial TextDisplay', (WidgetTester tester) async {
-    TimerController timerController = TimerController(const TestVSync());
-    await tester.pumpWidget(getSimpleTimerCountUpWidget(timerController));
+      // verify that the Text widget does not appear in the widget tree.
+      expect(textFinder, findsNothing);
+    });
 
-    // find the SimpleTimer text display widget in the widget tree
-    final textDisplayFinder = find.text("0:00");
+    testWidgets('Count Up Progress Text initial TextDisplay', (WidgetTester tester) async {
+      TimerController timerController = TimerController(const TestVSync());
+      await tester.pumpWidget(getSimpleTimerCountUpWidget(timerController));
 
-    // verify that the Text widget and value appear exactly once in the widget tree.
-    expect(textDisplayFinder, findsOneWidget);
+      // find the SimpleTimer text display widget in the widget tree
+      final textDisplayFinder = find.text("0:00");
+
+      // verify that the Text widget and value appear exactly once in the widget tree.
+      expect(textDisplayFinder, findsOneWidget);
+    });
+
+    testWidgets('Count Down Timer Progress Text End Value', (WidgetTester tester) async {
+      TimerController timerController = TimerController(const TestVSync());
+      await tester.pumpWidget(getSimpleTimerWidget(timerController));
+      timerController.start();
+      // continuously build the animated widget until the end of the animation
+      await tester.pumpAndSettle();
+
+      // find the SimpleTimer text display widget in the widget tree
+      final textDisplayFinder = find.text("0:00");
+
+      // verify that the Text widget and value appear exactly once in the widget tree.
+      expect(textDisplayFinder, findsOneWidget);
+      // ensure the controller value is now at its upper band
+      expect(timerController.value, equals(1));
+      // ensure the duration value is still correct
+      expect(timerController.duration, equals(Duration(seconds: 5)));
+      // ensure the animation has completed
+      expect(timerController.status, equals(AnimationStatus.completed));
+    });
+
+    testWidgets('Count Up Timer Progress Text End Value', (WidgetTester tester) async {
+      TimerController timerController = TimerController(const TestVSync());
+      await tester.pumpWidget(getSimpleTimerCountUpWidget(timerController));
+      timerController.start();
+      // continuously animate the widget until the end of the animation
+      await tester.pumpAndSettle();
+
+      // find the SimpleTimer text display widget in the widget tree
+      final textDisplayFinder = find.text("0:05");
+
+      // verify that the Text widget and value appear exactly once in the widget tree.
+      expect(textDisplayFinder, findsOneWidget);
+      // ensure the controller value is now at its upper band
+      expect(timerController.value, equals(1));
+      // ensure the duration value is still correct
+      expect(timerController.duration, equals(Duration(seconds: 5)));
+      // ensure the animation has completed
+      expect(timerController.status, equals(AnimationStatus.completed));
+    });
+
   });
 
   testWidgets('TimerController Duration is set', (WidgetTester tester) async {
@@ -43,46 +87,6 @@ void main() {
 
     expect(timerController.duration, equals(Duration(seconds: 5)));
     expect(timerController.delay, equals(Duration()));
-  });
-
-  testWidgets('Count Down Timer End Value', (WidgetTester tester) async {
-    TimerController timerController = TimerController(const TestVSync());
-    await tester.pumpWidget(getSimpleTimerWidget(timerController));
-    timerController.start();
-    // continuously build the animated widget until the end of the animation
-    await tester.pumpAndSettle();
-
-    // find the SimpleTimer text display widget in the widget tree
-    final textDisplayFinder = find.text("0:00");
-
-    // verify that the Text widget and value appear exactly once in the widget tree.
-    expect(textDisplayFinder, findsOneWidget);
-    // ensure the controller value is now at its upper band
-    expect(timerController.value, equals(1));
-    // ensure the duration value is still correct
-    expect(timerController.duration, equals(Duration(seconds: 5)));
-    // ensure the animation has completed
-    expect(timerController.status, equals(AnimationStatus.completed));
-  });
-
-  testWidgets('Count Up Timer End Value', (WidgetTester tester) async {
-    TimerController timerController = TimerController(const TestVSync());
-    await tester.pumpWidget(getSimpleTimerCountUpWidget(timerController));
-    timerController.start();
-    // continuously animate the widget until the end of the animation
-    await tester.pumpAndSettle();
-
-    // find the SimpleTimer text display widget in the widget tree
-    final textDisplayFinder = find.text("0:05");
-
-    // verify that the Text widget and value appear exactly once in the widget tree.
-    expect(textDisplayFinder, findsOneWidget);
-    // ensure the controller value is now at its upper band
-    expect(timerController.value, equals(1));
-    // ensure the duration value is still correct
-    expect(timerController.duration, equals(Duration(seconds: 5)));
-    // ensure the animation has completed
-    expect(timerController.status, equals(AnimationStatus.completed));
   });
 
   testWidgets('No TimerController/TimerStatus Assert Error', (WidgetTester tester) async {
