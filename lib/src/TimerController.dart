@@ -6,9 +6,12 @@ class TimerController extends AnimationController {
 
   Duration? _delay;
 
-  TimerController(TickerProvider vsync) : super(vsync: vsync);
+  bool initiateStarted = false;
+
+  TimerController(TickerProvider vsync, {this.initiateStarted: false}) : super(vsync: vsync, duration: Duration.zero);
 
   Duration? get delay => _delay;
+
 
   /// Sets the animation delay
   void _setDelay(Duration delay) {

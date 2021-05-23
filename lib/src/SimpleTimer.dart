@@ -162,6 +162,8 @@ class TimerState extends State<SimpleTimer> with SingleTickerProviderStateMixin 
     controller.addStatusListener(_animationStatusListener);
     if(_useLocalController && (widget.status == TimerStatus.start)) {
       _startTimer(true);
+    } else if (controller.initiateStarted) {
+      controller.start();
     }
     super.initState();
   }
